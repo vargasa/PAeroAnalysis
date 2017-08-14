@@ -13,6 +13,10 @@
 #define YHI 50.
 #define NXBIN 120
 #define NYBIN 100
+//Signal
+#define SGNBIN 100
+#define SGNLO 0
+#define SGNHI 50
 
 //ROOTfile for 488 seems to be broken 
 Int_t SignalvsYPosition(Int_t RunNumber = 929){
@@ -27,10 +31,15 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   TTreeReaderArray<Double_t> fy(fReader,"P.tr.y");
   TTreeReaderArray<Double_t> fth(fReader,"P.tr.th");
   TTreeReaderArray<Double_t> fph(fReader,"P.tr.ph");
+  
+  //Aerogel Variables 
+  TTreeReaderValue<Double_t> fsumNpe(fReader,"P.aero.npeSum");
+
 
   TCanvas *ch = new TCanvas("ch");
   TH1I *hnTracks = new TH1I("hnTracks",Form("Tracks per event Run:%d",RunNumber),15,0,15);
   TH2D *hxy = new TH2D("hxy",Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),NXBIN,XLO,XHI,NYBIN,YLO,YHI);
+  TH2D *hNpeY = new TH2D("hNpeY",Form("Signal vs Y Run:%d",RunNumber),NYBIN,YLO,YHI,SGNBIN,SGNLO,SGNHI);
   
   while(fReader.Next()){
 
@@ -43,8 +52,15 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
 	Float_t xh = fx[0] + fth[0]*ZAERO;
 	Float_t yh = fy[0] + fph[0]*ZAERO;
         hxy->Fill(xh, yh);
+	hNpeY->Fill(yh, *fsumNpe);
       }
   }
+
+  hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
+  hNpeY->GetYaxis()->SetTitle("Total number of Pe");
+  hNpeY->GetZaxis()->SetTitle("Counts");
+  hNpeY->Draw();
+  ch->Print(Form("SignalVsY_r%d.png",RunNumber));
 
   hxy->GetXaxis()->SetTitle("X-AeroAxis");
   hxy->GetYaxis()->SetTitle("Y-AeroAxis");

@@ -57,10 +57,14 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   }
 
   hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
-  hNpeY->GetYaxis()->SetTitle("Total number of Pe");
+  hNpeY->GetYaxis()->SetTitle("Total Npe");
   hNpeY->GetZaxis()->SetTitle("Counts");
   hNpeY->Draw();
   ch->Print(Form("SignalVsY_r%d.png",RunNumber));
+  hNpeY->Draw("COLZ");
+  ch->Print(Form("SignalVsY_r%d_COL.png",RunNumber));
+  hNpeY->Draw("LEGO");
+  ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
 
   hxy->GetXaxis()->SetTitle("X-AeroAxis");
   hxy->GetYaxis()->SetTitle("Y-AeroAxis");

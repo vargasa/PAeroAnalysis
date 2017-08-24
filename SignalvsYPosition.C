@@ -21,7 +21,7 @@
 //ROOTfile for 488 seems to be broken 
 Int_t SignalvsYPosition(Int_t RunNumber = 929){
 
-  TFile *fFile = TFile::Open(Form("../ROOTfiles/shms_replay_production_%d_-1.root", RunNumber));
+  TFile *fFile = TFile::Open(Form("/lustre/expphy/volatile/hallc/spring17/vargasa/ROOTfiles/shms_replay_production_%d_-1.root", RunNumber));
 
   TTreeReader fReader("T",fFile);
 
@@ -42,7 +42,9 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   TH1I *hnTracks = new TH1I("hnTracks",Form("Tracks per event Run:%d",RunNumber),15,0,15);
   TH2D *hxy = new TH2D("hxy",Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),NXBIN,XLO,XHI,NYBIN,YLO,YHI);
   TH2D *hNpeY = new TH2D("hNpeY",Form("Signal vs Y Run:%d",RunNumber),NYBIN,YLO,YHI,100,SGNLO,SGNHI);
-  TH3D *hxyNpe = new TH3D("hxyNpe",Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),12,XLO,XHI,10,YLO,YHI,10,SGNLO,SGNHI);
+  TH2D *hNpeX = new TH2D("hNpeX",Form("Signal vs X Run:%d",RunNumber),NXBIN,XLO,XHI,100,SGNLO,SGNHI);
+  TH3D *hxyNpe = new TH3D("hxyNpe",Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),12,XLO,XHI,10,YLO,YHI,20,SGNLO,SGNHI);
+
   
   while(fReader.Next()){
 
@@ -57,10 +59,17 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
 
         hxy->Fill(xh, yh);
 	hNpeY->Fill(yh, *fsumNpe);
+	hNpeX->Fill(xh, *fsumNpe);
 	hxyNpe->Fill(xh, yh, *fsumNpe);
 
       }
   }
+
+  hNpeX->GetXaxis()->SetTitle("X-AeroAxis");
+  hNpeX->GetYaxis()->SetTitle("Total Npe");
+  hNpeX->GetZaxis()->SetTitle("Counts");
+  hNpeX->Draw("COLZ");
+  ch->Print(Form("SignalVsX_r%d_COL.png",RunNumber));
 
   hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
   hNpeY->GetYaxis()->SetTitle("Total Npe");

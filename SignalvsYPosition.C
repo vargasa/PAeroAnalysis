@@ -21,7 +21,7 @@
 //ROOTfile for 488 seems to be broken 
 Int_t SignalvsYPosition(Int_t RunNumber = 929){
 
-  TFile *fFile = TFile::Open(Form("/lustre/expphy/volatile/hallc/spring17/vargasa/ROOTfiles/shms_replay_production_%d_-1.root", RunNumber));
+  TFile *fFile = TFile::Open(Form("/volatile/hallc/spring17/vargasa/ROOTfiles/shms_replay_production_%d_-1.root", RunNumber));
 
   TTreeReader fReader("T",fFile);
 
@@ -78,8 +78,8 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   //ch->Print(Form("SignalVsY_r%d.png",RunNumber));
   hNpeY->Draw("COLZ");
   ch->Print(Form("SignalVsY_r%d_COL.png",RunNumber));
-  //hNpeY->Draw("LEGO");
-  //ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
+  hNpeY->Draw("LEGO");
+  ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
 
   hxyNpe->GetXaxis()->SetTitle("X-AeroAxis");
   hxyNpe->GetYaxis()->SetTitle("Y-AeroAxis");

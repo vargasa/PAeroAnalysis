@@ -1,0 +1,7 @@
+PROJECT: shms
+TRACK: debug
+JOBNAME: shmspaero
+COMMAND: /home/vargasa/PAeroAnalysis/Analysis.csh
+MAIL: vargasa@jlab.org
+OS: centos7
+MEMORY: 1600 MB

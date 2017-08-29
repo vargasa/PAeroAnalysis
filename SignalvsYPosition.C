@@ -57,11 +57,10 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
 	Float_t xh = fx[0] + fth[0]*ZAERO;
 	Float_t yh = fy[0] + fph[0]*ZAERO;
 
-        hxy->Fill(xh, yh);
+        hxy->Fill(yh, xh);
 	hNpeY->Fill(yh, *fsumNpe);
 	hNpeX->Fill(xh, *fsumNpe);
-	hxyNpe->Fill(xh, yh, *fsumNpe);
-
+	hxyNpe->Fill(yh, xh, *fsumNpe);
       }
   }
 
@@ -80,18 +79,20 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   ch->Print(Form("SignalVsY_r%d_COL.png",RunNumber));
   hNpeY->Draw("LEGO");
   ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
-
-  hxyNpe->GetXaxis()->SetTitle("X-AeroAxis");
-  hxyNpe->GetYaxis()->SetTitle("Y-AeroAxis");
+ 
+  hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis");
+  hxyNpe->GetYaxis()->SetTitle("X-AeroAxis");
   hxyNpe->GetZaxis()->SetTitle("fsumNpe");
   hxyNpe->Draw("BOX2 Z");
   ch->Print(Form("xyNpe_r%d.png",RunNumber));
 
-  hxy->GetXaxis()->SetTitle("X-AeroAxis");
-  hxy->GetYaxis()->SetTitle("Y-AeroAxis");
+  hxy->GetXaxis()->SetTitle("Y-AeroAxis");
+  hxy->GetYaxis()->SetTitle("X-AeroAxis");
   hxy->GetZaxis()->SetTitle("Counts");
   hxy->Draw("COLZ");
-  ch->Print(Form("xy_r%d.png",RunNumber));
+  ch->Print(Form("xy_r%d_COL.png",RunNumber));
+  hxy->Draw("LEGO");
+  ch->Print(Form("xy_r%d_LEGO.png",RunNumber));
   
   gPad->SetLogy();
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");

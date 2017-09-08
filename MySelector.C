@@ -11,6 +11,7 @@
 // To use this file, try the following session on your Tree T:
 
 #include "MySelector.h"
+#include "TParameter.h"
 
 MySelector::MySelector(TTree *)
   : fn(fReader, "P.tr.n"),
@@ -22,8 +23,6 @@ MySelector::MySelector(TTree *)
     fposNpe(fReader,"P.aero.posNpe"),
     fnegNpe(fReader,"P.aero.negNpe") 
 {
-
-  cout << Form("Processing RunNumber:%d \n", RunNumber);
   //Initialization avoids warning messages
   hnTracks = 0;
   hxy = 0;
@@ -34,9 +33,18 @@ MySelector::MySelector(TTree *)
 
 void MySelector::Init(TTree *tree)
 {
-   // Associate the reader and the tree
-   fReader.SetTree(tree); 
-   
+  //Called every time a new TTree is attached.
+  fReader.SetTree(tree); 
+  
+}
+void MySelector::Begin(TTree *tree) {
+  
+  // When using PROOF, Begin() is called on the client only.
+  if (fInput->FindObject("RunNumber")) {
+    TParameter<Int_t> *p = dynamic_cast<TParameter<Int_t>*>(fInput->FindObject("RunNumber"));
+    RunNumber = p->GetVal();
+  }
+  
 }
  
 void MySelector::SlaveBegin(TTree *tree) {
@@ -46,7 +54,7 @@ void MySelector::SlaveBegin(TTree *tree) {
 
   // fOutput is inherited from TSelector. Make sure you ::Add the objects
   // which will be used in different methods of the class (specially in Terminate).
-  
+      
   hnTracks = new TH1I("hnTracks",Form("Tracks per event Run:%d",RunNumber),15,0,15);
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");
   hnTracks->GetYaxis()->SetTitle("Counts");

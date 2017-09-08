@@ -55,6 +55,7 @@ class MySelector : public TSelector {
   
   MySelector(TTree * = 0);
   virtual ~MySelector() { }
+  virtual void    Begin(TTree *tree);
   virtual void    Init(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);
   virtual Bool_t  Process(Long64_t entry);

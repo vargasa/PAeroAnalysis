@@ -49,26 +49,11 @@ class MySelector : public TSelector {
   
   TCanvas *ch;
 
-  Int_t RunNumber = 464;
-
  public :
+
+  Int_t RunNumber;
   
- MySelector(TTree * = 0): fn(fReader, "P.tr.n"),
-    fx(fReader, "P.tr.x"),
-    fy(fReader, "P.tr.y"),
-    fth(fReader, "P.tr.th"),
-    fph(fReader, "P.tr.ph"),
-    fsumNpe(fReader,"P.aero.npeSum"),
-    fposNpe(fReader,"P.aero.posNpe"),
-    fnegNpe(fReader,"P.aero.negNpe")
-      {
-	//Initialization avoids warning messages
-	hnTracks = 0;
-	hxy = 0;
-	hNpeY = 0;
-	hNpeX = 0;
-	hxyNpe = 0;
-      }
+  MySelector(TTree * = 0);
   virtual ~MySelector() { }
   virtual void    Init(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);

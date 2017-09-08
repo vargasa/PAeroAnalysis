@@ -12,10 +12,31 @@
 
 #include "MySelector.h"
 
+MySelector::MySelector(TTree *)
+  : fn(fReader, "P.tr.n"),
+    fx(fReader, "P.tr.x"),
+    fy(fReader, "P.tr.y"),
+    fth(fReader, "P.tr.th"),
+    fph(fReader, "P.tr.ph"),
+    fsumNpe(fReader,"P.aero.npeSum"),
+    fposNpe(fReader,"P.aero.posNpe"),
+    fnegNpe(fReader,"P.aero.negNpe") 
+{
+
+  cout << Form("Processing RunNumber:%d \n", RunNumber);
+  //Initialization avoids warning messages
+  hnTracks = 0;
+  hxy = 0;
+  hNpeY = 0;
+  hNpeX = 0;
+  hxyNpe = 0;
+}
+
 void MySelector::Init(TTree *tree)
 {
    // Associate the reader and the tree
-   fReader.SetTree(tree);
+   fReader.SetTree(tree); 
+   
 }
  
 void MySelector::SlaveBegin(TTree *tree) {

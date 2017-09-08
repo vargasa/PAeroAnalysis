@@ -27,6 +27,7 @@ class MySelector : public TSelector {
   // Variables used to access and store the data
   TTreeReader fReader;                            // The tree reader
   
+  //Variables information can be fount at THcAerogel source code files
   //Drift chamber variables
   TTreeReaderValue<Double_t> fn;
   TTreeReaderArray<Double_t> fx;

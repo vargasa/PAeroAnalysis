@@ -1,7 +1,3 @@
-// This class is derived from the ROOT class TSelector to demonstrate
-// the use of PROOF with the ROOT 6 Analysis Workshop from
-// http://root.cern.ch/drupal/content/root-6-analysis-workshop
-//
 // For more information on the TSelector framework see
 // $ROOTSYS/README/README.SELECTOR or the ROOT User Manual.
 // The following methods are defined in this file:
@@ -26,6 +22,9 @@ void MySelector::SlaveBegin(TTree *tree) {
    // SlaveBegin() is a good place to create histograms.
    // For PROOF, this is called for each worker.
    // The TTree* is there for backward compatibility; e.g. PROOF passes 0.
+
+  // fOutput is inherited from TSelector. Make sure you ::Add the objects
+  // which will be used in different methods of the class (specially in Terminate).
   
   hnTracks = new TH1I("hnTracks",Form("Tracks per event Run:%d",RunNumber),15,0,15);
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");
@@ -80,7 +79,8 @@ Bool_t MySelector::Process(Long64_t entry) {
      //Projections into the Aerogel detector
      Float_t xh = fx[0] + fth[0]*ZAERO;
      Float_t yh = fy[0] + fph[0]*ZAERO;
-     
+
+     //We need the deference operator when using TTreeReaderValue instances
      hxy->Fill(yh, xh);
      hNpeY->Fill(yh, *fsumNpe);
      hNpeX->Fill(xh, *fsumNpe);
@@ -97,27 +97,27 @@ void MySelector::Terminate() {
 
   ch = new TCanvas("ch");
   hNpeX->Draw("COLZ");
-  ch->Print(Form("SignalVsX_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
   
   //hNpeY->Draw();
   //ch->Print(Form("SignalVsY_r%d.png",RunNumber));
   hNpeY->Draw("COLZ");
-  ch->Print(Form("SignalVsY_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/SignalVsY_r%d_COL.png",RunNumber));
   hNpeY->Draw("LEGO");
-  ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
+  ch->Print(Form("Output/SignalVsY_r%d_LEGO.png",RunNumber));
  
 
   hxyNpe->Draw("BOX2 Z");
-  ch->Print(Form("xyNpe_r%d.png",RunNumber));
+  ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
 
   hxy->Draw("COLZ");
-  ch->Print(Form("xy_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/xy_r%d_COL.png",RunNumber));
   hxy->Draw("LEGO");
-  ch->Print(Form("xy_r%d_LEGO.png",RunNumber));
+  ch->Print(Form("Output/xy_r%d_LEGO.png",RunNumber));
   
   gPad->SetLogy();
   hnTracks->Draw();
-  ch->Print(Form("TracksPerEvnt_r%d.png",RunNumber));
+  ch->Print(Form("Output/TracksPerEvnt_r%d.png",RunNumber));
   
 }
 

@@ -19,9 +19,9 @@
 #define SGNHI 50
 
 //ROOTfile for 488 seems to be broken 
-Int_t SignalvsYPosition(Int_t RunNumber = 929){
+Int_t SignalvsYPosition(Int_t RunNumber = 929, TString fROOTFilesDir = "/volatile/hallc/spring17/vargasa/ROOTfiles/"){
 
-  TFile *fFile = TFile::Open(Form("/volatile/hallc/spring17/vargasa/ROOTfiles/shms_replay_production_%d_-1.root", RunNumber));
+  TFile *fFile = TFile::Open(Form("%s/shms_replay_production_%d_-1.root", fROOTFilesDir.Data(), RunNumber));
 
   TTreeReader fReader("T",fFile);
 
@@ -68,7 +68,7 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   hNpeX->GetYaxis()->SetTitle("Total Npe");
   hNpeX->GetZaxis()->SetTitle("Counts");
   hNpeX->Draw("COLZ");
-  ch->Print(Form("SignalVsX_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
 
   hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
   hNpeY->GetYaxis()->SetTitle("Total Npe");
@@ -76,29 +76,29 @@ Int_t SignalvsYPosition(Int_t RunNumber = 929){
   //hNpeY->Draw();
   //ch->Print(Form("SignalVsY_r%d.png",RunNumber));
   hNpeY->Draw("COLZ");
-  ch->Print(Form("SignalVsY_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/SignalVsY_r%d_COL.png",RunNumber));
   hNpeY->Draw("LEGO");
-  ch->Print(Form("SignalVsY_r%d_LEGO.png",RunNumber));
+  ch->Print(Form("Output/SignalVsY_r%d_LEGO.png",RunNumber));
  
   hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis");
   hxyNpe->GetYaxis()->SetTitle("X-AeroAxis");
   hxyNpe->GetZaxis()->SetTitle("fsumNpe");
   hxyNpe->Draw("BOX2 Z");
-  ch->Print(Form("xyNpe_r%d.png",RunNumber));
+  ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
 
   hxy->GetXaxis()->SetTitle("Y-AeroAxis");
   hxy->GetYaxis()->SetTitle("X-AeroAxis");
   hxy->GetZaxis()->SetTitle("Counts");
   hxy->Draw("COLZ");
-  ch->Print(Form("xy_r%d_COL.png",RunNumber));
+  ch->Print(Form("Output/xy_r%d_COL.png",RunNumber));
   hxy->Draw("LEGO");
-  ch->Print(Form("xy_r%d_LEGO.png",RunNumber));
+  ch->Print(Form("Output/xy_r%d_LEGO.png",RunNumber));
   
   gPad->SetLogy();
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");
   hnTracks->GetYaxis()->SetTitle("Counts");
   hnTracks->Draw();
-  ch->Print(Form("TracksPerEvnt_r%d.png",RunNumber));
+  ch->Print(Form("Output/TracksPerEvnt_r%d.png",RunNumber));
 
   return 0;
 }

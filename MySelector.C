@@ -10,6 +10,7 @@
 //
 // To use this file, try the following session on your Tree T:
 
+#include "TFile.h"
 #include "MySelector.h"
 #include "TParameter.h"
 
@@ -111,34 +112,28 @@ void MySelector::Terminate() {
    // analysis of a tree with a selector. It always runs on the client, it can
    // be used to present the results graphically or save the results to file.
 
-  hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
-  hnTracks->GetXaxis()->SetTitle("Number of Tracks");
-  hnTracks->GetYaxis()->SetTitle("Counts");
-  
+  ch = new TCanvas("ch");
+
+  TFile *fFile = new TFile(Form("Output/%d.root",RunNumber), "RECREATE");
+
+
   hxy->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
-  hxy->GetXaxis()->SetTitle("Y-AeroAxis");
-  hxy->GetYaxis()->SetTitle("X-AeroAxis");
+  hxy->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
+  hxy->GetYaxis()->SetTitle("X-AeroAxis (cm)");
   hxy->GetZaxis()->SetTitle("Counts");
+  hxy->SetOption("COLZ");
+  hxy->Write();
+  hxy->Draw("COLZ");
+  ch->Print(Form("Output/xy_r%d_COL.png",RunNumber));
+  hxy->Draw("LEGO");
+  ch->Print(Form("Output/xy_r%d_LEGO.png",RunNumber));
 
   hNpeY->SetTitle(Form("Signal vs Y Run:%d",RunNumber));
-  hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
+  hNpeY->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
   hNpeY->GetYaxis()->SetTitle("Total Npe");
   hNpeY->GetZaxis()->SetTitle("Counts");
-  
-  hNpeX->SetTitle(Form("Signal vs X Run:%d",RunNumber));
-  hNpeX->GetXaxis()->SetTitle("X-AeroAxis");
-  hNpeX->GetYaxis()->SetTitle("Total Npe");
-  hNpeX->GetZaxis()->SetTitle("Counts");
-
-  hxyNpe->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
-  hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis");
-  hxyNpe->GetYaxis()->SetTitle("X-AeroAxis");
-  hxyNpe->GetZaxis()->SetTitle("fsumNpe");
-
-  ch = new TCanvas("ch");
-  hNpeX->Draw("COLZ");
-  ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
-  
+  hNpeY->SetOption("COLZ");
+  hNpeY->Write();
   //hNpeY->Draw();
   //ch->Print(Form("SignalVsY_r%d.png",RunNumber));
   hNpeY->Draw("COLZ");
@@ -146,17 +141,33 @@ void MySelector::Terminate() {
   hNpeY->Draw("LEGO");
   ch->Print(Form("Output/SignalVsY_r%d_LEGO.png",RunNumber));
 
+  hNpeX->SetTitle(Form("Signal vs X Run:%d",RunNumber));
+  hNpeX->GetXaxis()->SetTitle("X-AeroAxis (cm)");
+  hNpeX->GetYaxis()->SetTitle("Total Npe");
+  hNpeX->GetZaxis()->SetTitle("Counts");
+  hNpeX->SetOption("COLZ");
+  hNpeX->Write();
+  hNpeX->Draw("COLZ");
+  ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
+  
+  hxyNpe->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
+  hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
+  hxyNpe->GetYaxis()->SetTitle("X-AeroAxis (cm)");
+  hxyNpe->GetZaxis()->SetTitle("fsumNpe");
+  hxyNpe->SetOption("BOX2");
   hxyNpe->Draw("BOX2 Z");
+  hxyNpe->Write();
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
 
-  hxy->Draw("COLZ");
-  ch->Print(Form("Output/xy_r%d_COL.png",RunNumber));
-  hxy->Draw("LEGO");
-  ch->Print(Form("Output/xy_r%d_LEGO.png",RunNumber));
-  
+  hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
+  hnTracks->GetXaxis()->SetTitle("Number of Tracks");
+  hnTracks->GetYaxis()->SetTitle("Counts");
+  hnTracks->Write();
   gPad->SetLogy();
   hnTracks->Draw();
   ch->Print(Form("Output/TracksPerEvnt_r%d.png",RunNumber));
+
+  fFile->Write();
   
 }
 

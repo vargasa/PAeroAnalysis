@@ -9,6 +9,7 @@
 #include "TH3D.h"
 
 #define ZAERO 235.
+// Active area 60cm*90cm
 #define XLO -60.
 #define XHI 60.
 #define YLO -50.

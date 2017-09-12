@@ -54,34 +54,21 @@ void MySelector::SlaveBegin(TTree *tree) {
 
   // fOutput is inherited from TSelector. Make sure you ::Add the objects
   // which will be used in different methods of the class (specially in Terminate).
-      
-  hnTracks = new TH1I("hnTracks",Form("Tracks per event Run:%d",RunNumber),15,0,15);
-  hnTracks->GetXaxis()->SetTitle("Number of Tracks");
-  hnTracks->GetYaxis()->SetTitle("Counts");
+
+  // Histogram's title is being set by the Client
+  hnTracks = new TH1I("hnTracks","",15,0,15);
   fOutput->Add(hnTracks);
   
-  hxy = new TH2D("hxy", Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),NXBIN,XLO,XHI,NYBIN,YLO,YHI);
-  hxy->GetXaxis()->SetTitle("Y-AeroAxis");
-  hxy->GetYaxis()->SetTitle("X-AeroAxis");
-  hxy->GetZaxis()->SetTitle("Counts");
+  hxy = new TH2D("hxy","",NXBIN,XLO,XHI,NYBIN,YLO,YHI);
   fOutput->Add(hxy);
 
-  hNpeY = new TH2D("hNpeY",Form("Signal vs Y Run:%d",RunNumber),NYBIN,YLO,YHI,100,SGNLO,SGNHI);
-  hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
-  hNpeY->GetYaxis()->SetTitle("Total Npe");
-  hNpeY->GetZaxis()->SetTitle("Counts");
+  hNpeY = new TH2D("hNpeY","",NYBIN,YLO,YHI,100,SGNLO,SGNHI);
   fOutput->Add(hNpeY);
   
-  hNpeX = new TH2D("hNpeX",Form("Signal vs X Run:%d",RunNumber),NXBIN,XLO,XHI,100,SGNLO,SGNHI);
-  hNpeX->GetXaxis()->SetTitle("X-AeroAxis");
-  hNpeX->GetYaxis()->SetTitle("Total Npe");
-  hNpeX->GetZaxis()->SetTitle("Counts");
+  hNpeX = new TH2D("hNpeX","",NXBIN,XLO,XHI,100,SGNLO,SGNHI);
   fOutput->Add(hNpeX);
 
-  hxyNpe = new TH3D("hxyNpe",Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber),12,XLO,XHI,10,YLO,YHI,20,SGNLO,SGNHI);
-  hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis");
-  hxyNpe->GetYaxis()->SetTitle("X-AeroAxis");
-  hxyNpe->GetZaxis()->SetTitle("fsumNpe");
+  hxyNpe = new TH3D("hxyNpe","",12,XLO,XHI,10,YLO,YHI,20,SGNLO,SGNHI);
   fOutput->Add(hxyNpe);
  
 }
@@ -124,6 +111,30 @@ void MySelector::Terminate() {
    // analysis of a tree with a selector. It always runs on the client, it can
    // be used to present the results graphically or save the results to file.
 
+  hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
+  hnTracks->GetXaxis()->SetTitle("Number of Tracks");
+  hnTracks->GetYaxis()->SetTitle("Counts");
+  
+  hxy->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
+  hxy->GetXaxis()->SetTitle("Y-AeroAxis");
+  hxy->GetYaxis()->SetTitle("X-AeroAxis");
+  hxy->GetZaxis()->SetTitle("Counts");
+
+  hNpeY->SetTitle(Form("Signal vs Y Run:%d",RunNumber));
+  hNpeY->GetXaxis()->SetTitle("Y-AeroAxis");
+  hNpeY->GetYaxis()->SetTitle("Total Npe");
+  hNpeY->GetZaxis()->SetTitle("Counts");
+  
+  hNpeX->SetTitle(Form("Signal vs X Run:%d",RunNumber));
+  hNpeX->GetXaxis()->SetTitle("X-AeroAxis");
+  hNpeX->GetYaxis()->SetTitle("Total Npe");
+  hNpeX->GetZaxis()->SetTitle("Counts");
+
+  hxyNpe->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
+  hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis");
+  hxyNpe->GetYaxis()->SetTitle("X-AeroAxis");
+  hxyNpe->GetZaxis()->SetTitle("fsumNpe");
+
   ch = new TCanvas("ch");
   hNpeX->Draw("COLZ");
   ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
@@ -134,7 +145,6 @@ void MySelector::Terminate() {
   ch->Print(Form("Output/SignalVsY_r%d_COL.png",RunNumber));
   hNpeY->Draw("LEGO");
   ch->Print(Form("Output/SignalVsY_r%d_LEGO.png",RunNumber));
- 
 
   hxyNpe->Draw("BOX2 Z");
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));

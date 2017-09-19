@@ -1,3 +1,5 @@
+// From ROOT6.06 is better to use  $rootprint
+// see  https://root.cern.ch/how/how-quickly-inspect-content-file
 void PrintHisto (Int_t RunNumber = 929) {
   
   TFile *f1 = TFile::Open(Form("Output/%d.root", RunNumber));
@@ -11,7 +13,7 @@ void PrintHisto (Int_t RunNumber = 929) {
     TH1 *h = (TH1*)key->ReadObj();
     
     h->Draw();
-    c1.Print(Form("%s.png", h->GetTitle()));
+    c1.Print(Form("Output/%s.png", h->GetTitle()));
   }
 
 }

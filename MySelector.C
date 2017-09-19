@@ -154,7 +154,7 @@ void MySelector::Terminate() {
   hxyNpe->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
   hxyNpe->GetYaxis()->SetTitle("X-AeroAxis (cm)");
   hxyNpe->GetZaxis()->SetTitle("fsumNpe");
-  hxyNpe->SetOption("BOX2");
+  hxyNpe->SetOption("BOX2 Z");
   hxyNpe->Draw("BOX2 Z");
   hxyNpe->Write();
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));

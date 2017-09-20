@@ -38,6 +38,7 @@ class MySelector : public TSelector {
 
   //Calorimeter Variables
   TTreeReaderValue<Double_t> fpreplane;
+  TTreeReaderValue<Double_t> fcalearray;
 
   // Gas Cerenkov Variables
   TTreeReaderValue<Double_t> fhgcernpeSum;
@@ -50,17 +51,24 @@ class MySelector : public TSelector {
 
   // Histograms
   // Aerogel
+  // for Variable descriptions hcana/src/THcAerogel.cxx
   TH1I *hnTracks;
   TH2D *hxy;
   TH2D *hNpeY;
   TH2D *hNpeX;
   TH3D *hxyNpe;
 
+
   // Heavy Gas Cherenkov
+  // for Variable descriptions hcana/src/THcShowerPlane.cxx
   TH2D *hHGCPreShEnergy;
   
   // Noble Gas Cherenkov
   TH2D *hNGCPreShEnergy;
+
+  // Calorimeter
+  // For Variable descriptions hcana/src/THcShowerArray.cxx
+  TH2D *hShEArrayPreShEnergy;
   
   TCanvas *ch;
 

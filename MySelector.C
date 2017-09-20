@@ -25,8 +25,10 @@ MySelector::MySelector(TTree *)
     fnegNpe(fReader,"P.aero.negNpe"),
     fpreplane(fReader,"P.cal.pr.eplane"),
     fhgcernpeSum(fReader,"P.hgcer.npeSum"),
-    fngcernpeSum(fReader,"P.ngcer.npeSum")
+    fngcernpeSum(fReader,"P.ngcer.npeSum"),
+    fcalearray(fReader,"P.cal.fly.earray")
 {
+  
   //Initialization avoids warning messages
   hnTracks = 0;
   hxy = 0;
@@ -35,6 +37,7 @@ MySelector::MySelector(TTree *)
   hxyNpe = 0;
   hHGCPreShEnergy = 0;
   hNGCPreShEnergy = 0;
+  hShEArrayPreShEnergy = 0;
 }
 
 void MySelector::Init(TTree *tree)
@@ -84,6 +87,8 @@ void MySelector::SlaveBegin(TTree *tree) {
   hNGCPreShEnergy = new TH2D("hNGCPreShEnergy","",300.,0.,3.,40.,0.,20.);
   fOutput->Add(hNGCPreShEnergy);
 
+  hShEArrayPreShEnergy = new TH2D("hShEtotPreShEnergy","",350,0.,5.,350,0.,10.);
+  fOutput->Add(hShEArrayPreShEnergy);
 }
  
 Bool_t MySelector::Process(Long64_t entry) {
@@ -102,11 +107,12 @@ Bool_t MySelector::Process(Long64_t entry) {
    // *** 2. *** Do the actual analysis
    Int_t n = TMath::Nint(*fn);
    hnTracks->Fill(n);
-
+   
    // Need to clarify this cut
    if ( *fpreplane>0.0) {
      if (*fhgcernpeSum>0.0) hHGCPreShEnergy->Fill(*fpreplane,*fhgcernpeSum);
      if (*fngcernpeSum>0.0) hNGCPreShEnergy->Fill(*fpreplane,*fngcernpeSum);
+     if (*fcalearray>0.0) hShEArrayPreShEnergy->Fill(*fpreplane,*fcalearray);
    }
 
    //Only takes into account one single track events
@@ -192,6 +198,15 @@ void MySelector::Terminate() {
   hNGCPreShEnergy->Draw("COLZ");
   hNGCPreShEnergy->Write();
   ch->Print(Form("Output/hNGC_r%d.png",RunNumber));
+
+  hShEArrayPreShEnergy->SetTitle(Form("Sh Array Energy vs. PreSh Energy; Run:%d",RunNumber));
+  hShEArrayPreShEnergy->GetXaxis()->SetTitle("PreShower Energy / 0.1 GeV");
+  hShEArrayPreShEnergy->GetYaxis()->SetTitle("Shower Array Energy / 0.1 GeV");
+  gPad->SetLogz();
+  hShEArrayPreShEnergy->SetOption("COLZ");
+  hShEArrayPreShEnergy->Draw("COLZ");
+  hShEArrayPreShEnergy->Write();
+  ch->Print(Form("Output/hShPreSh_r%d.png",RunNumber));
 
   hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");

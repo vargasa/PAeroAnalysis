@@ -22,7 +22,10 @@ MySelector::MySelector(TTree *)
     fph(fReader, "P.tr.ph"),
     fsumNpe(fReader,"P.aero.npeSum"),
     fposNpe(fReader,"P.aero.posNpe"),
-    fnegNpe(fReader,"P.aero.negNpe") 
+    fnegNpe(fReader,"P.aero.negNpe"),
+    fpreplane(fReader,"P.cal.pr.eplane"),
+    fhgcernpeSum(fReader,"P.hgcer.npeSum"),
+    fngcernpeSum(fReader,"P.ngcer.npeSum")
 {
   //Initialization avoids warning messages
   hnTracks = 0;
@@ -30,6 +33,8 @@ MySelector::MySelector(TTree *)
   hNpeY = 0;
   hNpeX = 0;
   hxyNpe = 0;
+  hHGCPreShEnergy = 0;
+  hNGCPreShEnergy = 0;
 }
 
 void MySelector::Init(TTree *tree)
@@ -71,7 +76,14 @@ void MySelector::SlaveBegin(TTree *tree) {
 
   hxyNpe = new TH3D("hxyNpe","",12,XLO,XHI,10,YLO,YHI,20,SGNLO,SGNHI);
   fOutput->Add(hxyNpe);
- 
+
+  // Values have been taken from hallc_replay/SHMS/PRODUCTION/CAL/pcal_histos.def
+  hHGCPreShEnergy = new TH2D("hHGCPreShEnergy","",300.,0.,3.,40.,0.,20.);
+  fOutput->Add(hHGCPreShEnergy);
+
+  hNGCPreShEnergy = new TH2D("hNGCPreShEnergy","",300.,0.,3.,40.,0.,20.);
+  fOutput->Add(hNGCPreShEnergy);
+
 }
  
 Bool_t MySelector::Process(Long64_t entry) {
@@ -90,6 +102,12 @@ Bool_t MySelector::Process(Long64_t entry) {
    // *** 2. *** Do the actual analysis
    Int_t n = TMath::Nint(*fn);
    hnTracks->Fill(n);
+
+   // Need to clarify this cut
+   if ( *fpreplane>0.0) {
+     if (*fhgcernpeSum>0.0) hHGCPreShEnergy->Fill(*fpreplane,*fhgcernpeSum);
+     if (*fngcernpeSum>0.0) hNGCPreShEnergy->Fill(*fpreplane,*fngcernpeSum);
+   }
 
    //Only takes into account one single track events
    if(n==1){
@@ -158,6 +176,22 @@ void MySelector::Terminate() {
   hxyNpe->Draw("BOX2 Z");
   hxyNpe->Write();
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
+
+  hHGCPreShEnergy->SetTitle(Form("SHMS HGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));
+  hHGCPreShEnergy->GetXaxis()->SetTitle("Total PreSh Energy Deposition / 0.01 GeV");
+  hHGCPreShEnergy->GetYaxis()->SetTitle("HGC Total N.P.E. / 0.5");
+  hHGCPreShEnergy->SetOption("COLZ");
+  hHGCPreShEnergy->Draw("COLZ");
+  hHGCPreShEnergy->Write();
+  ch->Print(Form("Output/hHGC_r%d.png",RunNumber));
+
+  hNGCPreShEnergy->SetTitle(Form("SHMS NGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));
+  hNGCPreShEnergy->GetXaxis()->SetTitle("Total PreSh Energy Deposition / 0.01 GeV");
+  hNGCPreShEnergy->GetYaxis()->SetTitle("NGC Total N.P.E. / 0.5");
+  hNGCPreShEnergy->SetOption("COLZ");
+  hNGCPreShEnergy->Draw("COLZ");
+  hNGCPreShEnergy->Write();
+  ch->Print(Form("Output/hNGC_r%d.png",RunNumber));
 
   hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");

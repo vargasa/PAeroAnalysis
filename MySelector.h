@@ -35,18 +35,32 @@ class MySelector : public TSelector {
   TTreeReaderArray<Double_t> fy;
   TTreeReaderArray<Double_t> fth;
   TTreeReaderArray<Double_t> fph;
+
+  //Calorimeter Variables
+  TTreeReaderValue<Double_t> fpreplane;
+
+  // Gas Cerenkov Variables
+  TTreeReaderValue<Double_t> fhgcernpeSum;
+  TTreeReaderValue<Double_t> fngcernpeSum;
   
   //Aerogel Variables
   TTreeReaderValue<Double_t> fsumNpe;
   TTreeReaderArray<Double_t> fposNpe;
   TTreeReaderArray<Double_t> fnegNpe;
 
-  //Histograms
+  // Histograms
+  // Aerogel
   TH1I *hnTracks;
   TH2D *hxy;
   TH2D *hNpeY;
   TH2D *hNpeX;
   TH3D *hxyNpe;
+
+  // Heavy Gas Cherenkov
+  TH2D *hHGCPreShEnergy;
+  
+  // Noble Gas Cherenkov
+  TH2D *hNGCPreShEnergy;
   
   TCanvas *ch;
 

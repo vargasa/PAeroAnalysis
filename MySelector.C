@@ -26,7 +26,10 @@ MySelector::MySelector(TTree *)
     fpreplane(fReader,"P.cal.pr.eplane"),
     fhgcernpeSum(fReader,"P.hgcer.npeSum"),
     fngcernpeSum(fReader,"P.ngcer.npeSum"),
-    fcalearray(fReader,"P.cal.fly.earray")
+    fcalearray(fReader,"P.cal.fly.earray"),
+    fgtrp(fReader,"P.gtr.p"),
+    fgtrbeta(fReader,"P.gtr.beta"),
+    fhodbeta(fReader,"P.hod.beta")
 {
   
   //Initialization avoids warning messages
@@ -38,6 +41,7 @@ MySelector::MySelector(TTree *)
   hHGCPreShEnergy = 0;
   hNGCPreShEnergy = 0;
   hShEArrayPreShEnergy = 0;
+  hgtrBetaP = 0;
 }
 
 void MySelector::Init(TTree *tree)
@@ -87,8 +91,12 @@ void MySelector::SlaveBegin(TTree *tree) {
   hNGCPreShEnergy = new TH2D("hNGCPreShEnergy","",300.,0.,3.,40.,0.,20.);
   fOutput->Add(hNGCPreShEnergy);
 
+  // No information given 
   hShEArrayPreShEnergy = new TH2D("hShEtotPreShEnergy","",350,0.,5.,350,0.,10.);
   fOutput->Add(hShEArrayPreShEnergy);
+
+  hgtrBetaP = new TH2D("hgtrBetaP","",300,0.,6.,300,0.,2.);
+  fOutput->Add(hgtrBetaP);
 }
  
 Bool_t MySelector::Process(Long64_t entry) {
@@ -107,19 +115,21 @@ Bool_t MySelector::Process(Long64_t entry) {
    // *** 2. *** Do the actual analysis
    Int_t n = TMath::Nint(*fn);
    hnTracks->Fill(n);
-   
-   // Need to clarify this cut
-   if ( *fpreplane>0.0) {
-     if (*fhgcernpeSum>0.0) hHGCPreShEnergy->Fill(*fpreplane,*fhgcernpeSum);
-     if (*fngcernpeSum>0.0) hNGCPreShEnergy->Fill(*fpreplane,*fngcernpeSum);
-     if (*fcalearray>0.0) hShEArrayPreShEnergy->Fill(*fpreplane,*fcalearray);
-   }
+
 
    //Only takes into account one single track events
    if(n==1){
      //Projections into the Aerogel detector
      Float_t xh = fx[0] + fth[0]*ZAERO;
      Float_t yh = fy[0] + fph[0]*ZAERO;
+     
+     // Need to clarify this cut
+     if ( *fpreplane>0.0) {
+       if (*fhgcernpeSum>0.0) hHGCPreShEnergy->Fill(*fpreplane,*fhgcernpeSum);
+       if (*fngcernpeSum>0.0) hNGCPreShEnergy->Fill(*fpreplane,*fngcernpeSum);
+       if (*fcalearray>0.0) hShEArrayPreShEnergy->Fill(*fpreplane,*fcalearray);
+       hgtrBetaP->Fill(*fgtrp,*fgtrbeta);
+     }
 
      //We need the deference operator when using TTreeReaderValue instances
      hxy->Fill(yh, xh);
@@ -140,27 +150,26 @@ void MySelector::Terminate() {
 
   TFile *fFile = new TFile(Form("Output/%d.root",RunNumber), "RECREATE");
 
-
   hxy->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
   hxy->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
   hxy->GetYaxis()->SetTitle("X-AeroAxis (cm)");
   hxy->GetZaxis()->SetTitle("Counts");
-  hxy->SetOption("COLZ");
+  hxy->SetOption("COLZ 0");
   hxy->Write();
-  hxy->Draw("COLZ");
+  hxy->Draw("COLZ 0");
   ch->Print(Form("Output/xy_r%d_COL.png",RunNumber));
-  hxy->Draw("LEGO");
+  hxy->Draw("LEGO2Z");
   ch->Print(Form("Output/xy_r%d_LEGO.png",RunNumber));
 
   hNpeY->SetTitle(Form("Signal vs Y Run:%d",RunNumber));
   hNpeY->GetXaxis()->SetTitle("Y-AeroAxis (cm)");
   hNpeY->GetYaxis()->SetTitle("Total Npe");
   hNpeY->GetZaxis()->SetTitle("Counts");
-  hNpeY->SetOption("COLZ");
+  hNpeY->SetOption("COLZ 0");
   hNpeY->Write();
   //hNpeY->Draw();
   //ch->Print(Form("SignalVsY_r%d.png",RunNumber));
-  hNpeY->Draw("COLZ");
+  hNpeY->Draw("COLZ 0");
   ch->Print(Form("Output/SignalVsY_r%d_COL.png",RunNumber));
   hNpeY->Draw("LEGO");
   ch->Print(Form("Output/SignalVsY_r%d_LEGO.png",RunNumber));
@@ -169,9 +178,9 @@ void MySelector::Terminate() {
   hNpeX->GetXaxis()->SetTitle("X-AeroAxis (cm)");
   hNpeX->GetYaxis()->SetTitle("Total Npe");
   hNpeX->GetZaxis()->SetTitle("Counts");
-  hNpeX->SetOption("COLZ");
+  hNpeX->SetOption("COLZ 0");
   hNpeX->Write();
-  hNpeX->Draw("COLZ");
+  hNpeX->Draw("COLZ 0");
   ch->Print(Form("Output/SignalVsX_r%d_COL.png",RunNumber));
   
   hxyNpe->SetTitle(Form("Spacial distribution of events in the Aerogel Detector Run:%d",RunNumber));
@@ -186,16 +195,16 @@ void MySelector::Terminate() {
   hHGCPreShEnergy->SetTitle(Form("SHMS HGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));
   hHGCPreShEnergy->GetXaxis()->SetTitle("Total PreSh Energy Deposition / 0.01 GeV");
   hHGCPreShEnergy->GetYaxis()->SetTitle("HGC Total N.P.E. / 0.5");
-  hHGCPreShEnergy->SetOption("COLZ");
-  hHGCPreShEnergy->Draw("COLZ");
+  hHGCPreShEnergy->SetOption("COLZ 0");
+  hHGCPreShEnergy->Draw("COLZ 0");
   hHGCPreShEnergy->Write();
   ch->Print(Form("Output/hHGC_r%d.png",RunNumber));
 
   hNGCPreShEnergy->SetTitle(Form("SHMS NGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));
   hNGCPreShEnergy->GetXaxis()->SetTitle("Total PreSh Energy Deposition / 0.01 GeV");
   hNGCPreShEnergy->GetYaxis()->SetTitle("NGC Total N.P.E. / 0.5");
-  hNGCPreShEnergy->SetOption("COLZ");
-  hNGCPreShEnergy->Draw("COLZ");
+  hNGCPreShEnergy->SetOption("COLZ 0");
+  hNGCPreShEnergy->Draw("COLZ 0");
   hNGCPreShEnergy->Write();
   ch->Print(Form("Output/hNGC_r%d.png",RunNumber));
 
@@ -203,10 +212,19 @@ void MySelector::Terminate() {
   hShEArrayPreShEnergy->GetXaxis()->SetTitle("PreShower Energy / 0.1 GeV");
   hShEArrayPreShEnergy->GetYaxis()->SetTitle("Shower Array Energy / 0.1 GeV");
   gPad->SetLogz();
-  hShEArrayPreShEnergy->SetOption("COLZ");
-  hShEArrayPreShEnergy->Draw("COLZ");
+  hShEArrayPreShEnergy->SetOption("COLZ 0");
+  hShEArrayPreShEnergy->Draw("COLZ 0");
   hShEArrayPreShEnergy->Write();
   ch->Print(Form("Output/hShPreSh_r%d.png",RunNumber));
+
+  hgtrBetaP->SetTitle(Form("Gtr Beta vs Momentum; Run:%d",RunNumber));
+  hgtrBetaP->GetXaxis()->SetTitle("Momentum");
+  hgtrBetaP->GetYaxis()->SetTitle("Beta");
+  hgtrBetaP->SetOption("COLZ 0");
+  hgtrBetaP->Draw("COLZ 0");
+  hgtrBetaP->Write();
+  hgtrBetaP->SetStats(kFALSE);
+  ch->Print(Form("Output/hGTR_r%d.png",RunNumber));
 
   hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");

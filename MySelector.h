@@ -49,6 +49,12 @@ class MySelector : public TSelector {
   TTreeReaderArray<Double_t> fposNpe;
   TTreeReaderArray<Double_t> fnegNpe;
 
+  // Golden Track Variables
+  TTreeReaderValue<Double_t> fgtrp;
+  TTreeReaderValue<Double_t> fgtrbeta;
+
+  TTreeReaderValue<Double_t> fhodbeta;
+
   // Histograms
   // Aerogel
   // for Variable descriptions hcana/src/THcAerogel.cxx
@@ -57,7 +63,6 @@ class MySelector : public TSelector {
   TH2D *hNpeY;
   TH2D *hNpeX;
   TH3D *hxyNpe;
-
 
   // Heavy Gas Cherenkov
   // for Variable descriptions hcana/src/THcShowerPlane.cxx
@@ -69,6 +74,9 @@ class MySelector : public TSelector {
   // Calorimeter
   // For Variable descriptions hcana/src/THcShowerArray.cxx
   TH2D *hShEArrayPreShEnergy;
+
+  // Golden Track
+  TH2D *hgtrBetaP;
   
   TCanvas *ch;
 

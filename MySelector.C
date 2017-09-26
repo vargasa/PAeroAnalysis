@@ -14,41 +14,6 @@
 #include "MySelector.h"
 #include "TParameter.h"
 
-TGraph2D* MySelector::SpatialAerogelSignal(){
-
-  TGraph2D *gxyNpe = new TGraph2D();
-
-  Int_t nx = hxyNpe->GetNbinsX();
-  Int_t ny = hxyNpe->GetNbinsY();
-  Int_t nz = hxyNpe->GetNbinsZ();
-
-  Int_t nbin;
-  Int_t nn = 0;
-  Double_t x, y, npe, nw, nevts;
-  Double_t avgnpe = 0.0;
-
-  for (Int_t i = 1; i <= nx; i++) {
-    x = hxyNpe->GetXaxis()->GetBinCenter(i);
-    for (Int_t j = 1; j <= ny; j++) {
-      y = hxyNpe->GetYaxis()->GetBinCenter(j);  
-      for (Int_t k = 1; k <= nz; k++) {
-	//nbin = hxyNpe->GetBin(k,j,i);
-	npe = hxyNpe->GetZaxis()->GetBinCenter(k);
-	nw = hxyNpe->GetBinContent(i,j,k);
-	avgnpe += (npe*nw);
-	nevts += nw;
-      }
-      avgnpe = avgnpe/nevts;
-      gxyNpe->SetPoint(nn,x,y,avgnpe);
-      nevts = 0;
-      avgnpe = 0.0;
-      nn++;      
-    }
-  }
-  return gxyNpe;
-  
-}
-
 MySelector::MySelector(TTree *)
   : fn(fReader, "P.tr.n"),
     fx(fReader, "P.tr.x"),
@@ -77,6 +42,7 @@ MySelector::MySelector(TTree *)
   hNGCPreShEnergy = 0;
   hShEArrayPreShEnergy = 0;
   hgtrBetaP = 0;
+  gxyNpe=0;
 }
 
 void MySelector::Init(TTree *tree)
@@ -132,6 +98,9 @@ void MySelector::SlaveBegin(TTree *tree) {
 
   hgtrBetaP = new TH2D("hgtrBetaP","",300,0.,6.,300,0.,2.);
   fOutput->Add(hgtrBetaP);
+
+  gxyNpe = new TGraph2D();
+  fOutput->Add(gxyNpe);
 }
  
 Bool_t MySelector::Process(Long64_t entry) {
@@ -171,6 +140,14 @@ Bool_t MySelector::Process(Long64_t entry) {
      hNpeY->Fill(yh, *fsumNpe);
      hNpeX->Fill(xh, *fsumNpe);
      hxyNpe->Fill(yh, xh, *fsumNpe);
+
+     if(*fsumNpe<20){
+       if ( xh > YLO && xh < YHI ) {
+	 if ( yh > XLO  &&  yh < XHI ) {
+	   gxyNpe->SetPoint(gxyNpe->GetN(),yh,xh,*fsumNpe);
+	 }
+       }
+     }
    }
 
    return kTRUE;
@@ -227,14 +204,12 @@ void MySelector::Terminate() {
   hxyNpe->Write();
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
 
-  TGraph2D *gxyNpe = this->SpatialAerogelSignal();
-  gxyNpe->SetTitle("Npe vs Spatial Coordinates");
-  gxyNpe->GetXaxis()->SetTitle("X-Aero(cm)");
-  gxyNpe->GetYaxis()->SetTitle("Y-Aero(cm)");
-  gxyNpe->GetZaxis()->SetTitle("Npe");
-  gxyNpe->SetNpx(160);
-  gxyNpe->SetNpy(160);
-  gxyNpe->Draw("COLZ");
+  // Do not use TAxis::SetTitle https://root-forum.cern.ch/t/tgraph2d-not-showing-axis-labels/26324
+  gxyNpe->SetTitle("Npe vs Spatial Coordinates;X-Aero(cm);Y-Aero(cm);Npe");
+  gxyNpe->SetNpx(500);
+  gxyNpe->SetNpy(500);
+  gxyNpe->Draw("COLZ 0");
+  gxyNpe->Write();
   ch->Print(Form("Output/gxyNpe_r%d.png",RunNumber));
 
   hHGCPreShEnergy->SetTitle(Form("SHMS HGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));

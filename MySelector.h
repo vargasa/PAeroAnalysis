@@ -78,6 +78,8 @@ class MySelector : public TSelector {
 
   // Golden Track
   TH2D *hgtrBetaP;
+
+  TGraph2D *gxyNpe;
   
   TCanvas *ch;
 

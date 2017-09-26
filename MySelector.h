@@ -7,6 +7,7 @@
 #include "TH1I.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include "TGraph2D.h"
 
 #define ZAERO 235.
 // Active area 60cm*90cm
@@ -89,6 +90,7 @@ class MySelector : public TSelector {
   virtual void    Begin(TTree *tree);
   virtual void    Init(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);
+  TGraph2D* SpatialAerogelSignal();
   virtual Bool_t  Process(Long64_t entry);
   virtual void    Terminate();
   virtual Int_t   Version() const { return 2; }

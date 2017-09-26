@@ -14,6 +14,41 @@
 #include "MySelector.h"
 #include "TParameter.h"
 
+TGraph2D* MySelector::SpatialAerogelSignal(){
+
+  TGraph2D *gxyNpe = new TGraph2D();
+
+  Int_t nx = hxyNpe->GetNbinsX();
+  Int_t ny = hxyNpe->GetNbinsY();
+  Int_t nz = hxyNpe->GetNbinsZ();
+
+  Int_t nbin;
+  Int_t nn = 0;
+  Double_t x, y, npe, nw, nevts;
+  Double_t avgnpe = 0.0;
+
+  for (Int_t i = 1; i <= nx; i++) {
+    x = hxyNpe->GetXaxis()->GetBinCenter(i);
+    for (Int_t j = 1; j <= ny; j++) {
+      y = hxyNpe->GetYaxis()->GetBinCenter(j);  
+      for (Int_t k = 1; k <= nz; k++) {
+	//nbin = hxyNpe->GetBin(k,j,i);
+	npe = hxyNpe->GetZaxis()->GetBinCenter(k);
+	nw = hxyNpe->GetBinContent(i,j,k);
+	avgnpe += (npe*nw);
+	nevts += nw;
+      }
+      avgnpe = avgnpe/nevts;
+      gxyNpe->SetPoint(nn,x,y,avgnpe);
+      nevts = 0;
+      avgnpe = 0.0;
+      nn++;      
+    }
+  }
+  return gxyNpe;
+  
+}
+
 MySelector::MySelector(TTree *)
   : fn(fReader, "P.tr.n"),
     fx(fReader, "P.tr.x"),
@@ -81,7 +116,7 @@ void MySelector::SlaveBegin(TTree *tree) {
   hNpeX = new TH2D("hNpeX","",NXBIN,XLO,XHI,100,SGNLO,SGNHI);
   fOutput->Add(hNpeX);
 
-  hxyNpe = new TH3D("hxyNpe","",12,XLO,XHI,10,YLO,YHI,20,SGNLO,SGNHI);
+  hxyNpe = new TH3D("hxyNpe","",NXBIN,XLO,XHI,NYBIN,YLO,YHI,40,SGNLO,SGNHI);
   fOutput->Add(hxyNpe);
 
   // Values have been taken from hallc_replay/SHMS/PRODUCTION/CAL/pcal_histos.def
@@ -191,6 +226,16 @@ void MySelector::Terminate() {
   hxyNpe->Draw("BOX2 Z");
   hxyNpe->Write();
   ch->Print(Form("Output/xyNpe_r%d.png",RunNumber));
+
+  TGraph2D *gxyNpe = this->SpatialAerogelSignal();
+  gxyNpe->SetTitle("Npe vs Spatial Coordinates");
+  gxyNpe->GetXaxis()->SetTitle("X-Aero(cm)");
+  gxyNpe->GetYaxis()->SetTitle("Y-Aero(cm)");
+  gxyNpe->GetZaxis()->SetTitle("Npe");
+  gxyNpe->SetNpx(160);
+  gxyNpe->SetNpy(160);
+  gxyNpe->Draw("COLZ");
+  ch->Print(Form("Output/gxyNpe_r%d.png",RunNumber));
 
   hHGCPreShEnergy->SetTitle(Form("SHMS HGC Total N.P.E. vs. PreSh Energy; Run:%d",RunNumber));
   hHGCPreShEnergy->GetXaxis()->SetTitle("Total PreSh Energy Deposition / 0.01 GeV");

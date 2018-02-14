@@ -56,6 +56,10 @@ class MySelector : public TSelector {
 
   TTreeReaderValue<Double_t> fhodbeta;
 
+  // Some Kinematics variables from HMS
+  TTreeReaderValue<Double_t> fw;
+  TTreeReaderValue<Double_t> fcernpesum;
+
   // Histograms
   // Aerogel
   // for Variable descriptions hcana/src/THcAerogel.cxx
@@ -64,6 +68,12 @@ class MySelector : public TSelector {
   TH2D *hNpeY;
   TH2D *hNpeX;
   TH3D *hxyNpe;
+
+  // Histograms
+  // Kinematics
+  // for Variable descriptions hcana/src/THcPrimaryKine.cxx
+  TH2D *hcerw;
+  TH1D *hw;
 
   // Heavy Gas Cherenkov
   // for Variable descriptions hcana/src/THcShowerPlane.cxx

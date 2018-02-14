@@ -29,7 +29,9 @@ MySelector::MySelector(TTree *)
     fcalearray(fReader,"P.cal.fly.earray"),
     fgtrp(fReader,"P.gtr.p"),
     fgtrbeta(fReader,"P.gtr.beta"),
-    fhodbeta(fReader,"P.hod.beta")
+    fhodbeta(fReader,"P.hod.beta"),
+    fw(fReader,"H.kin.primary.W"),
+    fcernpesum(fReader,"H.cer.npeSum")
 {
   
   //Initialization avoids warning messages
@@ -43,6 +45,8 @@ MySelector::MySelector(TTree *)
   hShEArrayPreShEnergy = 0;
   hgtrBetaP = 0;
   gxyNpe=0;
+  hcerw=0;
+  hw=0;
 }
 
 void MySelector::Init(TTree *tree)
@@ -101,6 +105,13 @@ void MySelector::SlaveBegin(TTree *tree) {
 
   gxyNpe = new TGraph2D();
   fOutput->Add(gxyNpe);
+
+  //Values adjusted from TTree->Scan("H.kin.primary.W")
+  hcerw = new TH2D("hcerw","",100,0.,5.,50,0.,25.);
+  fOutput->Add(hcerw);
+
+  hw = new TH1D("h2","",100,0.,5.);
+  fOutput->Add(hw);
 }
  
 Bool_t MySelector::Process(Long64_t entry) {
@@ -136,6 +147,8 @@ Bool_t MySelector::Process(Long64_t entry) {
      }
 
      //We need the deference operator when using TTreeReaderValue instances
+     hw->Fill(*fw);
+     hcerw->Fill(*fw,*fcernpesum);
      hxy->Fill(yh, xh);
      hNpeY->Fill(yh, *fsumNpe);
      hNpeX->Fill(xh, *fsumNpe);
@@ -245,6 +258,16 @@ void MySelector::Terminate() {
   hgtrBetaP->Write();
   hgtrBetaP->SetStats(kFALSE);
   ch->Print(Form("Output/hGTR_r%d.png",RunNumber));
+
+  hcerw->SetTitle("H.cer.npeSum vs W;H.cer.npeSum;Counts");
+  hcerw->Draw("COLZ");
+  ch->Print(Form("Output/hcerw_r%d.png",RunNumber));
+
+  hw->SetTitle("W;W;Counts");
+  hw->Draw("HIST");
+  ch->Print(Form("Output/hw_r%d.png",RunNumber));
+
+
 
   hnTracks->SetTitle(Form("Tracks per event Run:%d",RunNumber));
   hnTracks->GetXaxis()->SetTitle("Number of Tracks");
